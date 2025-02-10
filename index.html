@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Streaming YouTube</title>
+</head>
+<body>
+    <h2>Kontrol Streaming YouTube</h2>
+
+    <label>Judul Streaming:</label>
+    <input type="text" id="title" placeholder="Masukkan judul"><br><br>
+
+    <label>Google Drive Video ID:</label>
+    <input type="text" id="videoId" placeholder="Masukkan ID video Google Drive"><br><br>
+
+    <button onclick="startStream()">Mulai Streaming</button>
+    <button onclick="stopStream()" style="background-color: red; color: white;">Berhenti Streaming</button>
+
+    <script>
+        let broadcastId = "";
+
+        function startStream() {
+            let title = document.getElementById("title").value;
+            let videoId = document.getElementById("videoId").value;
+
+            if (!title || !videoId) {
+                alert("Harap isi semua data!");
+                return;
+            }
+
+            fetch("http://localhost:5000/start", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ title, videoId })
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+                broadcastId = data.broadcastId;
+            })
+            .catch(error => alert("Gagal memulai streaming"));
+        }
+
+        function stopStream() {
+            if (!broadcastId) {
+                alert("Tidak ada streaming yang berjalan!");
+                return;
+            }
+
+            fetch("http://localhost:5000/stop", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ broadcastId })
+            })
+            .then(response => response.json())
+            .then(data => alert(data.message))
+            .catch(error => alert("Gagal menghentikan streaming"));
+        }
+    </script>
+</body>
+</html>
